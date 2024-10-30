@@ -2,11 +2,11 @@ import mongoose, { Document } from "mongoose";
 interface Task extends Document {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   dueDate: Date;
-  priority: "low" | "medium" | "high";
+  priority?: "low" | "medium" | "high";
   status: "todo" | "in-progress" | "completed";
-  tags: string[];
+  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,7 +27,6 @@ const taskSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
       maxlength: 1000,
       description: "Description of the task",
     },
@@ -38,7 +37,6 @@ const taskSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      required: true,
       enum: ["low", "medium", "high"],
       description: "Priority level of the task",
     },
@@ -50,7 +48,6 @@ const taskSchema = new mongoose.Schema(
     },
     tags: {
       type: [String],
-      required: true,
       maxlength: 50,
       description: "Tags associated with the task",
     },
