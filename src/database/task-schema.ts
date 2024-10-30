@@ -7,6 +7,7 @@ interface Task extends Document {
   priority?: "low" | "medium" | "high";
   status: "todo" | "in-progress" | "completed";
   tags?: string[];
+  username?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +51,10 @@ const taskSchema = new mongoose.Schema(
       type: [String],
       maxlength: 50,
       description: "Tags associated with the task",
+    },
+    username: {
+      type: String,
+      description: "Task belongs to this username",
     },
   },
   { timestamps: true }

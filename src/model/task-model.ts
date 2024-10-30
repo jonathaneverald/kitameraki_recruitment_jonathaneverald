@@ -8,6 +8,7 @@ export type TaskResponse = {
   priority: string;
   status: string;
   tags: string[];
+  username: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -48,6 +49,7 @@ export function toTaskResponse(task: Task): TaskResponse {
     priority: task.priority || "",
     status: task.status,
     tags: task.tags || [],
+    username: task.username || "",
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
   };
