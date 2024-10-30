@@ -1,6 +1,7 @@
 import express from "express";
 import { TaskController } from "../controller/task-controller";
 import { UserController } from "../controller/user-controller";
+import { authMiddleware } from "../middleware/auth-middleware";
 
 export const apiRouter = express.Router();
 
@@ -13,3 +14,7 @@ apiRouter.get("/api/tasks", TaskController.search);
 
 // User API
 apiRouter.post("/api/users/register", UserController.register);
+apiRouter.post("/api/users/login", UserController.login);
+
+apiRouter.use(authMiddleware);
+apiRouter.get("/api/users/current", UserController.get);

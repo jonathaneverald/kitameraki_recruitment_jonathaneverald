@@ -1,12 +1,14 @@
 import mongoose, { Document } from "mongoose";
 
-interface User extends Document {
+export interface IUser {
   user_id: string;
   username: string;
   name: string;
   password: string;
   token?: string;
 }
+
+export interface User extends Document, IUser {}
 
 const userSchema = new mongoose.Schema({
   user_id: { type: String, unique: true, required: true },
@@ -19,4 +21,3 @@ const userSchema = new mongoose.Schema({
 const UserModel = mongoose.model<User>("user", userSchema);
 
 export default UserModel;
-export type { User };
