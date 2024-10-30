@@ -19,3 +19,4 @@ apiRouter.post("/api/users/login", UserController.login);
 apiRouter.use(authMiddleware);
 apiRouter.get("/api/users/current", UserController.get);
 apiRouter.put("/api/users/current", UserController.update);
+apiRouter.delete("/api/users/current", UserController.logout);

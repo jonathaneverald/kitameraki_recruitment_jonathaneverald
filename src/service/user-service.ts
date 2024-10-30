@@ -63,14 +63,27 @@ export class UserService {
   static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
     const updateRequest = Validation.validate(UserValidation.UPDATE, request);
 
+    const updateData: any = {};
+
     if (updateRequest.name) {
-      user.name = updateRequest.name;
-    }
-    if (updateRequest.password) {
-      user.password = await bcrypt.hash(updateRequest.password, 10);
+      updateData.name = updateRequest.name;
     }
 
-    const result = await UserModel.findOneAndUpdate({ user_id: user.user_id }, { $set: updateRequest }, { new: true, runValidators: true });
+    if (updateRequest.password) {
+      updateData.password = await bcrypt.hash(updateRequest.password, 10);
+    }
+
+    const result = await UserModel.findOneAndUpdate({ user_id: user.user_id }, { $set: updateData }, { new: true, runValidators: true });
+
+    if (!result) {
+      throw new ResponseError(404, "User not found!");
+    }
+
+    return toUserResponse(result);
+  }
+
+  static async logout(user: User): Promise<UserResponse> {
+    const result = await UserModel.findOneAndUpdate({ username: user.username }, { $set: { token: null } }, { new: true });
 
     if (!result) {
       throw new ResponseError(404, "User not found!");
