@@ -1,4 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+interface Task extends Document {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: Date;
+  priority: "low" | "medium" | "high";
+  status: "todo" | "in-progress" | "completed";
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const taskSchema = new mongoose.Schema(
   {
@@ -16,15 +27,18 @@ const taskSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      required: true,
       maxlength: 1000,
       description: "Description of the task",
     },
     dueDate: {
       type: Date,
+      required: true,
       description: "Due date and time for the task",
     },
     priority: {
       type: String,
+      required: true,
       enum: ["low", "medium", "high"],
       description: "Priority level of the task",
     },
@@ -36,6 +50,7 @@ const taskSchema = new mongoose.Schema(
     },
     tags: {
       type: [String],
+      required: true,
       maxlength: 50,
       description: "Tags associated with the task",
     },
@@ -43,6 +58,7 @@ const taskSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Task = mongoose.model("task", taskSchema);
+const TaskModel = mongoose.model("task", taskSchema);
 
-export default Task;
+export default TaskModel;
+export type { Task };
