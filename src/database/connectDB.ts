@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
 import config from "../config/enviroment";
 import { logger } from "../application/logging";
-import { error } from "winston";
 
-mongoose
-  .connect(`${config.db}`)
-  .then(() => {
+export const connectDB = async () => {
+  try {
+    await mongoose.connect(`${config.db}`);
     logger.info("Connected to MongoDB");
-  })
-  .catch((error) => {
-    logger.info("Could not connect to MongoDB");
-    logger.error(error);
+  } catch (error) {
+    logger.error("Could not connect to MongoDB", error);
     process.exit(1);
-  });
+  }
+};
