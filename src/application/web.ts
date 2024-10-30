@@ -5,7 +5,7 @@ import { errorMiddleware } from "../middleware/error-middleware";
 
 export const web = express();
 
-const initializeServer = async () => {
+export const initializeServer = async () => {
   await connectDB();
   web.use(express.json());
   web.use(apiRouter);

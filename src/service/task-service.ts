@@ -45,4 +45,18 @@ export class TaskService {
 
     return toTaskResponse(task);
   }
+
+  static async delete(id: string): Promise<TaskResponse> {
+    await this.checkTaskId(id);
+
+    const task = await TaskModel.findOneAndDelete({
+      task_id: id,
+    });
+
+    if (!task) {
+      throw new ResponseError(404, "Task not found");
+    }
+
+    return toTaskResponse(task);
+  }
 }

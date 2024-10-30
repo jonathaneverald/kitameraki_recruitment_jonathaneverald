@@ -39,4 +39,15 @@ export class TaskController {
       next(e);
     }
   }
+
+  static async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await TaskService.delete(req.params.taskId);
+      res.status(200).json({
+        data: `Successfully delete task with ID: ${response.task_id}`,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
