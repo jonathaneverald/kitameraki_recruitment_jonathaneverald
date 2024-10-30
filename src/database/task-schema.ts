@@ -1,6 +1,6 @@
 import mongoose, { Document } from "mongoose";
 interface Task extends Document {
-  id: string;
+  task_id: string;
   title: string;
   description?: string;
   dueDate: Date;
@@ -13,7 +13,7 @@ interface Task extends Document {
 
 const taskSchema = new mongoose.Schema(
   {
-    id: {
+    task_id: {
       type: String,
       unique: true,
       required: true,
@@ -55,7 +55,7 @@ const taskSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const TaskModel = mongoose.model("task", taskSchema);
+const TaskModel = mongoose.model<Task>("task", taskSchema);
 
 export default TaskModel;
 export type { Task };
