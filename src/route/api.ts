@@ -8,3 +8,4 @@ apiRouter.post("/api/tasks", TaskController.create);
 apiRouter.get("/api/tasks/:taskId", TaskController.get);
 apiRouter.put("/api/tasks/:taskId", TaskController.update);
 apiRouter.delete("/api/tasks/:taskId", TaskController.delete);
+apiRouter.get("/api/tasks", TaskController.search);

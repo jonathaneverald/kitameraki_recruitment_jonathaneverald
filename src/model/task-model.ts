@@ -31,6 +31,14 @@ export type UpdateTaskRequest = {
   tags?: string[];
 };
 
+export type SearchTaskRequest = {
+  title?: string;
+  priority?: string;
+  status?: string;
+  page: number;
+  size: number;
+};
+
 export function toTaskResponse(task: Task): TaskResponse {
   return {
     task_id: task.task_id,

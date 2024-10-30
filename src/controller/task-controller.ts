@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { CreateTaskRequest, UpdateTaskRequest } from "../model/task-model";
+import { CreateTaskRequest, SearchTaskRequest, UpdateTaskRequest } from "../model/task-model";
 import { TaskService } from "../service/task-service";
 
 export class TaskController {
@@ -46,6 +46,22 @@ export class TaskController {
       res.status(200).json({
         data: `Successfully delete task with ID: ${response.task_id}`,
       });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async search(req: Request, res: Response, next: NextFunction) {
+    try {
+      const request: SearchTaskRequest = {
+        title: req.query.title as string,
+        priority: req.query.priority as string,
+        status: req.query.status as string,
+        page: req.query.page ? Number(req.query.page) : 1,
+        size: req.query.size ? Number(req.query.size) : 5,
+      };
+      const response = await TaskService.search(request);
+      res.status(200).json(response);
     } catch (e) {
       next(e);
     }

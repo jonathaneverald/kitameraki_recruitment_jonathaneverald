@@ -19,4 +19,12 @@ export class TaskValidation {
     status: z.enum(["todo", "in-progress", "completed"], { message: "Status must be one of: todo, in-progress, completed" }).optional(),
     tags: z.array(z.string().max(50, { message: "Each tag cannot exceed 50 characters" })).optional(),
   });
+
+  static readonly SEARCH: ZodType = z.object({
+    title: z.string().min(1, { message: "Title is required" }).max(100, { message: "Title cannot exceed 100 characters" }).optional(),
+    priority: z.enum(["low", "medium", "high"], { message: "Priority must be one of: low, medium, high" }).optional(),
+    status: z.enum(["todo", "in-progress", "completed"], { message: "Status must be one of: todo, in-progress, completed" }).optional(),
+    page: z.number().min(1).positive(),
+    size: z.number().min(1).max(100).positive(),
+  });
 }

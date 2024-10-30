@@ -1,6 +1,7 @@
 import TaskModel, { Task } from "../database/task-schema";
 import { ResponseError } from "../error/response-error";
-import { CreateTaskRequest, TaskResponse, toTaskResponse, UpdateTaskRequest } from "../model/task-model";
+import { Pageable } from "../model/page";
+import { CreateTaskRequest, SearchTaskRequest, TaskResponse, toTaskResponse, UpdateTaskRequest } from "../model/task-model";
 import { TaskValidation } from "../validation/task-validation";
 import { Validation } from "../validation/validation";
 
@@ -58,5 +59,42 @@ export class TaskService {
     }
 
     return toTaskResponse(task);
+  }
+
+  static async search(request: SearchTaskRequest): Promise<Pageable<TaskResponse>> {
+    const searchRequest = Validation.validate(TaskValidation.SEARCH, request);
+    const skip = (searchRequest.page - 1) * searchRequest.size;
+
+    const filters: any = {};
+    // Add title filter if provided
+    if (searchRequest.title) {
+      filters.title = { $regex: searchRequest.title, $options: "i" }; // 'i' for case-insensitive
+    }
+
+    // Add priority filter if provided
+    if (searchRequest.priority) {
+      filters.priority = searchRequest.priority;
+    }
+
+    // Add status filter if provided
+    if (searchRequest.status) {
+      filters.status = searchRequest.status;
+    }
+
+    // Find tasks with pagination
+    const tasks = await TaskModel.find(filters).skip(skip).limit(searchRequest.size).exec();
+
+    // Get total count for pagination
+    const total = await TaskModel.countDocuments(filters);
+
+    // Convert to response format
+    return {
+      data: tasks.map((task) => toTaskResponse(task)),
+      paging: {
+        current_page: searchRequest.page,
+        total_page: Math.ceil(total / searchRequest.size),
+        size: searchRequest.size,
+      },
+    };
   }
 }
