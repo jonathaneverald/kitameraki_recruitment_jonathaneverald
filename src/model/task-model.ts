@@ -1,6 +1,6 @@
 import { Task } from "../database/task-schema";
 
-export type TaskRespone = {
+export type TaskResponse = {
   task_id: string;
   title: string;
   description: string;
@@ -22,7 +22,16 @@ export type CreateTaskRequest = {
   tags: string[];
 };
 
-export function toTaskResponse(task: Task): TaskRespone {
+export type UpdateTaskRequest = {
+  title?: string;
+  description?: string;
+  dueDate?: Date;
+  priority?: string;
+  status?: string;
+  tags?: string[];
+};
+
+export function toTaskResponse(task: Task): TaskResponse {
   return {
     task_id: task.task_id,
     title: task.title,

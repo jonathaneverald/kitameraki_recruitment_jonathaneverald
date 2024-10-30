@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { CreateTaskRequest } from "../model/task-model";
+import { CreateTaskRequest, UpdateTaskRequest } from "../model/task-model";
 import { TaskService } from "../service/task-service";
 
 export class TaskController {
@@ -20,6 +20,18 @@ export class TaskController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
       const response = await TaskService.get(req.params.taskId);
+      res.status(200).json({
+        data: response,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const request: UpdateTaskRequest = req.body as UpdateTaskRequest;
+      const response = await TaskService.update(request, req.params.taskId);
       res.status(200).json({
         data: response,
       });
