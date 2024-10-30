@@ -1,10 +1,16 @@
 import TaskModel, { Task } from "../database/task-schema";
 import { ResponseError } from "../error/response-error";
 import { CreateTaskRequest, TaskRespone, toTaskResponse } from "../model/task-model";
+import { TaskValidation } from "../validation/task-validation";
+import { Validation } from "../validation/validation";
 
 export class TaskService {
   static async create(request: CreateTaskRequest): Promise<TaskRespone> {
-    const task: Task = await TaskModel.create(request);
+    if (request.dueDate) {
+      request.dueDate = new Date(request.dueDate);
+    }
+    const createRequest = Validation.validate(TaskValidation.CREATE, request);
+    const task: Task = await TaskModel.create(createRequest);
     return toTaskResponse(task);
   }
 
