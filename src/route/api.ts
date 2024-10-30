@@ -5,3 +5,4 @@ export const apiRouter = express.Router();
 
 // Task API
 apiRouter.post("/api/tasks", TaskController.create);
+apiRouter.get("/api/tasks/:taskId", TaskController.get);
