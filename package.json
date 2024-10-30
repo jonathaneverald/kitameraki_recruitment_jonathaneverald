@@ -4,7 +4,10 @@
   "description": "kitameraki technical test",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "dev": "npx ts-node ./src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js"
   },
   "jest": {
     "transform": {
@@ -15,6 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mongoose": "^8.7.3",
     "uuid": "^11.0.2",
