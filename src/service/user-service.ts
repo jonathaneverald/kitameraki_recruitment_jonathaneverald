@@ -1,6 +1,6 @@
 import UserModel, { IUser, User } from "../database/user-schema";
 import { ResponseError } from "../error/response-error";
-import { CreateUserRequest, LoginUserRequest, toUserResponse, UserResponse } from "../model/user-model";
+import { CreateUserRequest, LoginUserRequest, toUserResponse, UpdateUserRequest, UserResponse } from "../model/user-model";
 import { signJWT } from "../utils/jwt";
 import { UserValidation } from "../validation/user-validation";
 import { Validation } from "../validation/validation";
@@ -58,5 +58,24 @@ export class UserService {
 
   static async get(user: User): Promise<UserResponse> {
     return toUserResponse(user);
+  }
+
+  static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+    const updateRequest = Validation.validate(UserValidation.UPDATE, request);
+
+    if (updateRequest.name) {
+      user.name = updateRequest.name;
+    }
+    if (updateRequest.password) {
+      user.password = await bcrypt.hash(updateRequest.password, 10);
+    }
+
+    const result = await UserModel.findOneAndUpdate({ user_id: user.user_id }, { $set: updateRequest }, { new: true, runValidators: true });
+
+    if (!result) {
+      throw new ResponseError(404, "User not found!");
+    }
+
+    return toUserResponse(result);
   }
 }

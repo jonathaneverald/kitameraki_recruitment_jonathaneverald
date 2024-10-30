@@ -19,6 +19,11 @@ export type LoginUserRequest = {
   password: string;
 };
 
+export type UpdateUserRequest = {
+  name?: string;
+  password?: string;
+};
+
 export function toUserResponse(user: User | IUser): UserResponse {
   if (!user) {
     throw new Error("User object is required");
