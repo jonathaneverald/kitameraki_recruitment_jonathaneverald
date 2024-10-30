@@ -1,0 +1,10 @@
+import { z, ZodType } from "zod";
+
+export class UserValidation {
+  static readonly REGISTER: ZodType = z.object({
+    user_id: z.string().uuid({ message: "Invalid UUID format for id" }),
+    username: z.string().min(1, { message: "Username is required" }).max(100, { message: "Username cannot exceed 100 characters" }),
+    name: z.string().min(1, { message: "Name is required" }).max(100, { message: "Name cannot exceed 100 characters" }),
+    password: z.string().min(1).max(100),
+  });
+}
