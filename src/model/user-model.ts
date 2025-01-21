@@ -1,34 +1,22 @@
-export interface User {
+import { InvocationContext } from "@azure/functions";
+
+export type User = {
     id: string;
     username: string;
     name: string;
     password: string;
     token?: string;
+};
+
+export interface AuthenticatedContext extends InvocationContext {
+    currentUser?: User;
 }
 
-export type UserResponse = {
-    id: string;
-    username: string;
-    name: string;
-    token?: string;
-};
-
-export type CreateUserRequest = {
-    id: string;
-    username: string;
-    name: string;
-    password: string;
-};
-
-export type LoginUserRequest = {
-    username: string;
-    password: string;
-};
-
-export type UpdateUserRequest = {
-    name?: string;
-    password?: string;
-};
+export type UserResponse = Omit<User, "password">;
+export type CreateUserRequest = Omit<User, "token">;
+export type LoginUserRequest = Omit<User, "id" | "name" | "token">;
+export type UpdateUserRequest = Partial<Pick<User, "name" | "password">>;
+export type ProfileResponse = Omit<UserResponse, "token">;
 
 export const toUserResponse = (user: User): UserResponse => {
     if (!user) {
