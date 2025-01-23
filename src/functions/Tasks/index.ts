@@ -109,47 +109,30 @@ const deleteTask = async (request: HttpRequest, context: AuthenticatedContext, i
     }
 };
 
-app.http("tasks-create", {
-    methods: ["POST"],
+app.http("tasks", {
+    methods: ["GET", "POST"],
     authLevel: "anonymous",
-    handler: withAuth(createTask),
-});
-
-app.http("tasks-update", {
-    methods: ["PUT"],
-    authLevel: "anonymous",
-    route: "tasks-update/{id}",
+    route: "tasks",
     handler: async (request: HttpRequest, context: AuthenticatedContext) => {
-        const id = request.params.id; // Get the id from route parameters
-        return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await updateTask(req, ctx, id))(request, context);
+        if (request.method === "GET") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await getTasks(req, ctx))(request, context);
+        } else if (request.method === "POST") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await createTask(req, ctx))(request, context);
+        }
     },
 });
 
 app.http("tasks-detail", {
-    methods: ["GET"],
+    methods: ["PUT", "GET", "DELETE"],
     authLevel: "anonymous",
-    route: "tasks-detail/{id}",
+    route: "tasks/{id}",
     handler: async (request: HttpRequest, context: AuthenticatedContext) => {
-        const id = request.params.id; // Get the id from route parameters
-        return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await getTaskDetail(req, ctx, id))(request, context);
-    },
-});
-
-app.http("tasks-show", {
-    methods: ["GET"],
-    authLevel: "anonymous",
-    route: "tasks-show",
-    handler: async (request: HttpRequest, context: AuthenticatedContext) => {
-        return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await getTasks(req, ctx))(request, context);
-    },
-});
-
-app.http("tasks-delete", {
-    methods: ["DELETE"],
-    authLevel: "anonymous",
-    route: "tasks-delete/{id}",
-    handler: async (request: HttpRequest, context: AuthenticatedContext) => {
-        const id = request.params.id; // Get the id from route parameters
-        return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await deleteTask(req, ctx, id))(request, context);
+        if (request.method === "GET") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await getTaskDetail(req, ctx, req.params.id))(request, context);
+        } else if (request.method === "PUT") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await updateTask(req, ctx, req.params.id))(request, context);
+        } else if (request.method === "DELETE") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await deleteTask(req, ctx, req.params.id))(request, context);
+        }
     },
 });

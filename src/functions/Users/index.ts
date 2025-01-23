@@ -1,7 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { AuthenticatedContext, CreateUserRequest, LoginUserRequest, UpdateUserRequest, User } from "../../model/user-model";
 import { UserService } from "../../service/user-service";
-import { ResponseError } from "../../error/response-error";
 import { UserRequest } from "../../type/user-request";
 import { handleError } from "../../error/error-handler";
 import { withAuth } from "../../middleware/auth-middleware";
@@ -133,14 +132,15 @@ app.http("logout", {
     handler: withAuth(logout),
 });
 
-app.http("users-profile", {
-    methods: ["GET"],
+app.http("users", {
+    methods: ["GET", "PUT"],
     authLevel: "anonymous",
-    handler: withAuth(profile),
-});
-
-app.http("users-update", {
-    methods: ["PUT"],
-    authLevel: "anonymous",
-    handler: withAuth(update),
+    route: "users",
+    handler: async (request: HttpRequest, context: AuthenticatedContext) => {
+        if (request.method === "GET") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await profile(req, ctx))(request, context);
+        } else if (request.method === "PUT") {
+            return await withAuth(async (req: HttpRequest, ctx: AuthenticatedContext) => await update(req, ctx))(request, context);
+        }
+    },
 });
