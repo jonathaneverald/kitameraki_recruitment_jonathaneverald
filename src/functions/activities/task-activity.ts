@@ -1,6 +1,6 @@
 import { ActivityHandler } from "durable-functions";
 import { AuthenticatedContext, currentUser, User } from "../../model/user-model";
-import { Task, TaskRequest, UpdateTaskRequest } from "../../model/task-model";
+import { CreateTaskRequest, Task, TaskRequest, UpdateTaskRequest } from "../../model/task-model";
 import { TaskService } from "../../service/task-service";
 import * as df from "durable-functions";
 
@@ -16,7 +16,16 @@ const processTaskBatch: ActivityHandler = async (input: TaskActivityInput & { us
     for (const task of tasks) {
         try {
             if (operation === "create") {
-                results.push(`Created task with ID:  ${task.id}`);
+                const createTaskRequest: CreateTaskRequest = {
+                    title: task.title,
+                    description: task.description,
+                    dueDate: task.dueDate,
+                    priority: task.priority,
+                    status: task.status,
+                    tags: task.tags,
+                };
+                await TaskService.create(user, createTaskRequest);
+                results.push(`Created task:  ${task.title}`);
             } else if (operation === "update") {
                 const updateTaskRequest: UpdateTaskRequest = {
                     title: task.title,
@@ -32,6 +41,7 @@ const processTaskBatch: ActivityHandler = async (input: TaskActivityInput & { us
                 await TaskService.update(user, cleanedRequest, task.id);
                 results.push(`Updated task with ID:  ${task.id}`);
             } else if (operation === "delete") {
+                await TaskService.delete(user, task.id);
                 results.push(`Deleted task with ID:  ${task.id}`);
             } else {
                 results.push(`No operation performed on task ${task.id}`);

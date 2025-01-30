@@ -1,8 +1,8 @@
 import { OrchestrationContext, OrchestrationHandler } from "durable-functions";
 import * as df from "durable-functions";
-import { Task, TaskRequest } from "../../model/task-model";
+import { TaskRequest } from "../../model/task-model";
 import { TaskActivityInput } from "../activities/task-activity";
-import { currentUser, User } from "../../model/user-model";
+import { currentUser } from "../../model/user-model";
 
 const taskOrchestrator: OrchestrationHandler = function* (context: OrchestrationContext) {
     const input = context.df.getInput() as { tasks: TaskRequest[]; operation: string; user: currentUser };
