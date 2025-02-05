@@ -4,6 +4,7 @@ import { AuthenticatedContext } from "../model/user-model";
 import { CreateTaskRequest, SearchTaskRequest, UpdateTaskRequest } from "../model/task-model";
 import { handleError } from "../error/error-handler";
 import { withAuth } from "../middleware/auth-middleware";
+import { EventGridService } from "../service/eventGrid-service";
 
 const getTaskDetail = async (request: HttpRequest, context: AuthenticatedContext, id: string): Promise<HttpResponseInit> => {
     try {
@@ -27,6 +28,15 @@ const createTask = async (request: HttpRequest, context: AuthenticatedContext): 
         context.log(`Http function processed request for url "${request.url}"`);
         const createTaskRequest = (await request.json()) as CreateTaskRequest;
         const task = await TaskService.create(context.currentUser, createTaskRequest);
+        // call publish event here
+        const eventData = {
+            action: "create",
+            userId: context.currentUser.id,
+            task: task,
+            timestamp: new Date().toISOString(),
+        };
+        const publishEvent = await EventGridService.publishEvent("Task.Created", eventData);
+        console.log("Published event:", publishEvent);
         return {
             status: 201,
             body: JSON.stringify(task),

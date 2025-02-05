@@ -12,6 +12,7 @@ export interface TaskActivityInput {
 const processTaskBatch: ActivityHandler = async (input: TaskActivityInput & { user: currentUser }, context: AuthenticatedContext): Promise<string[]> => {
     const { tasks, operation, user } = input;
     const results: string[] = [];
+    console.log("Authenticated User: ", context.currentUser);
 
     for (const task of tasks) {
         try {

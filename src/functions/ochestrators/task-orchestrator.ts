@@ -6,6 +6,7 @@ import { currentUser } from "../../model/user-model";
 
 const taskOrchestrator: OrchestrationHandler = function* (context: OrchestrationContext) {
     const input = context.df.getInput() as { tasks: TaskRequest[]; operation: string; user: currentUser };
+    console.log("Orchestration Context:  ", context);
 
     // Add validation for empty input
     if (!input.tasks || input.tasks.length === 0) {

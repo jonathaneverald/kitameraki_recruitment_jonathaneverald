@@ -1,20 +1,22 @@
 import { Task } from "./task-model";
 
 export type Activity = {
-    id: string;
+    id?: string;
     action: string;
     userId: string;
-    timestamp: Date;
+    changes?: [];
+    task?: Task;
+    timestamp: string;
 };
 
-export type CreateActivityRequest = Activity & {
-    newTask: Task;
-};
+// export type CreateActivityRequest = Activity & {
+//     newTask: Task;
+// };
 
-export type UpdateActivityRequest = Activity & {
-    oldTask: Task;
-    changes: {
-        field: keyof Task;
-        newValue: any;
-    }[];
-};
+// export type UpdateActivityRequest = Activity & {
+//     oldTask: Task;
+//     changes: {
+//         field: keyof Task;
+//         newValue: any;
+//     }[];
+// };

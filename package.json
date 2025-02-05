@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@azure/cosmos": "^4.2.0",
+        "@azure/eventgrid": "^5.10.0",
         "@azure/functions": "^4.0.0",
         "durable-functions": "^3.0.0-alpha.5",
         "jsonwebtoken": "^9.0.2",
