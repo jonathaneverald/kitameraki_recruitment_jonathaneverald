@@ -4,7 +4,7 @@ import { ResponseError } from "../error/response-error";
 import { Task } from "../model/task-model";
 import { AuthenticatedContext, User } from "../model/user-model";
 import { cloudEventData } from "../type/eventGrid";
-import { Activity } from "../model/activity-model";
+import { ActivityLog } from "../model/activity-model";
 
 const databaseId = "TaskManagementJo";
 const conteinerId = "ActivityLog";
@@ -27,22 +27,14 @@ export class ActivityService {
             throw new ResponseError(400, "Validation failed", details);
         }
 
-        console.error("Unexpected error in task-service:", error);
+        console.error("Unexpected error in activity-service:", error);
         throw new ResponseError(500, "An unexpected error occurred");
     }
-    static async create(data: Activity, user: User) {
+    static async create(data: ActivityLog, userId: string) {
         try {
-            // const createdActivity: Activity = {
-            //     action: "create",
-            //     userId: user.id,
-            //     changes: [],
-            //     task: data,
-            //     timestamp: new Date().toISOString(),
-            // };
-
             const createdActivity = {
                 ...data,
-                userId: user.id,
+                userId: userId,
             };
             const { resource } = await container.items.create(createdActivity);
             return resource;

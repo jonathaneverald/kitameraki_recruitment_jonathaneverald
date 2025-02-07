@@ -3,6 +3,7 @@ import { AuthenticatedContext, currentUser, User } from "../../model/user-model"
 import { CreateTaskRequest, Task, TaskRequest, UpdateTaskRequest } from "../../model/task-model";
 import { TaskService } from "../../service/task-service";
 import * as df from "durable-functions";
+import { EventGridService } from "../../service/eventGrid-service";
 
 export interface TaskActivityInput {
     tasks: TaskRequest[];
@@ -25,7 +26,9 @@ const processTaskBatch: ActivityHandler = async (input: TaskActivityInput & { us
                     status: task.status,
                     tags: task.tags,
                 };
-                await TaskService.create(user, createTaskRequest);
+                const createdTask = await TaskService.create(user, createTaskRequest);
+                // Publish event
+                await EventGridService.publishEvent("create", "Task.Created", user.id, createdTask, []);
                 results.push(`Created task:  ${task.title}`);
             } else if (operation === "update") {
                 const updateTaskRequest: UpdateTaskRequest = {
@@ -39,10 +42,14 @@ const processTaskBatch: ActivityHandler = async (input: TaskActivityInput & { us
 
                 // Only include defined fields in the request
                 const cleanedRequest: UpdateTaskRequest = Object.fromEntries(Object.entries(updateTaskRequest).filter(([_, value]) => value !== undefined)) as UpdateTaskRequest;
-                await TaskService.update(user, cleanedRequest, task.id);
+                const updatedTask = await TaskService.update(user, cleanedRequest, task.id);
+                // Publish event
+                await EventGridService.publishEvent("update", "Task.Updated", user.id, updatedTask.updatedTask, updatedTask.changes);
                 results.push(`Updated task with ID:  ${task.id}`);
             } else if (operation === "delete") {
-                await TaskService.delete(user, task.id);
+                const deletedTask = await TaskService.delete(user, task.id);
+                // Publish event
+                await EventGridService.publishEvent("delete", "Task.Deleted", user.id, deletedTask, []);
                 results.push(`Deleted task with ID:  ${task.id}`);
             } else {
                 results.push(`No operation performed on task ${task.id}`);

@@ -29,14 +29,7 @@ const createTask = async (request: HttpRequest, context: AuthenticatedContext): 
         const createTaskRequest = (await request.json()) as CreateTaskRequest;
         const task = await TaskService.create(context.currentUser, createTaskRequest);
         // call publish event here
-        const eventData = {
-            action: "create",
-            userId: context.currentUser.id,
-            task: task,
-            timestamp: new Date().toISOString(),
-        };
-        const publishEvent = await EventGridService.publishEvent("Task.Created", eventData);
-        console.log("Published event:", publishEvent);
+        await EventGridService.publishEvent("create", "Task.Created", context.currentUser.id, task, []);
         return {
             status: 201,
             body: JSON.stringify(task),
@@ -54,6 +47,8 @@ const updateTask = async (request: HttpRequest, context: AuthenticatedContext, i
     try {
         const updateTaskRequest = (await request.json()) as UpdateTaskRequest;
         const task = await TaskService.update(context.currentUser, updateTaskRequest, id);
+        // Publish the event
+        await EventGridService.publishEvent("update", "Task.Updated", context.currentUser.id, task.updatedTask, task.changes);
         return {
             status: 200,
             body: JSON.stringify(task),
@@ -106,6 +101,8 @@ const getTasks = async (request: HttpRequest, context: AuthenticatedContext): Pr
 const deleteTask = async (request: HttpRequest, context: AuthenticatedContext, id: string): Promise<HttpResponseInit> => {
     try {
         const task = await TaskService.delete(context.currentUser, id);
+        // Publish the event
+        await EventGridService.publishEvent("delete", "Task.Deleted", context.currentUser.id, task, []);
         return {
             status: 200,
             body: JSON.stringify(task),

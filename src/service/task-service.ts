@@ -71,15 +71,28 @@ export class TaskService {
         return toTaskResponse(tasks[0]);
     }
 
-    static async update(user: User, request: UpdateTaskRequest, id: string): Promise<Task> {
+    static async update(user: User, request: UpdateTaskRequest, id: string): Promise<{ updatedTask: Task; changes?: { field: string; oldValue: string; newValue: string }[] }> {
         try {
             const existingTask = await this.checkTaskId(user.id, id);
             const updateRequest = TaskValidation.UPDATE.parse(request);
             const updates = getChangedTaskFields(updateRequest, existingTask);
 
             if (Object.keys(updates).length === 0) {
-                return toTaskResponse(existingTask); // Return current task if no changes
+                return { updatedTask: toTaskResponse(existingTask), changes: [] };
+                // return toTaskResponse(existingTask); // Return current task if no changes
             }
+
+            // Array to save the updated fields with old and new value
+            const changes = Object.keys(updates).map((field) => {
+                const oldValue = existingTask[field] ? String(existingTask[field]) : "";
+                const newValue = updates[field] ? String(updates[field]) : "";
+
+                return {
+                    field,
+                    oldValue,
+                    newValue,
+                };
+            });
 
             const updatedTask = {
                 ...existingTask,
@@ -88,7 +101,11 @@ export class TaskService {
             };
             await container.items.upsert(updatedTask);
 
-            return toTaskResponse(updatedTask);
+            // return toTaskResponse(updatedTask);
+            return {
+                updatedTask: toTaskResponse(updatedTask),
+                changes,
+            };
         } catch (error) {
             this.handleServiceError(error);
         }
@@ -163,7 +180,7 @@ export class TaskService {
     static async delete(user: User, id: string): Promise<Task> {
         try {
             const existingTask = await this.checkTaskId(user.id, id);
-            const { resource: deletedTask } = await container.item(existingTask.id, existingTask.userId).delete();
+            await container.item(existingTask.id, existingTask.userId).delete();
 
             return toTaskResponse(existingTask);
         } catch (error) {
