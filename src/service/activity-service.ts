@@ -2,8 +2,6 @@ import { z } from "zod";
 import { getContainer } from "../database/cosmosClient";
 import { ResponseError } from "../error/response-error";
 import { Task } from "../model/task-model";
-import { AuthenticatedContext, User } from "../model/user-model";
-import { cloudEventData } from "../type/eventGrid";
 import { ActivityLog } from "../model/activity-model";
 
 const databaseId = "TaskManagementJo";

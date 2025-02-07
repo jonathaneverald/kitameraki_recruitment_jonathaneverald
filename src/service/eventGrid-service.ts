@@ -19,7 +19,7 @@ export class EventGridService {
             },
         ];
         try {
-            const send = await client.send(events);
+            await client.send(events);
             console.log("Published event successfully");
         } catch (error) {
             console.error("Error publishing event:", error);

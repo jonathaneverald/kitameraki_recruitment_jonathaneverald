@@ -14,9 +14,26 @@ const containerId = "Users";
 const container = getContainer(databaseId, containerId);
 
 export class UserService {
+    private static handleServiceError(error: unknown): never {
+        if (error instanceof ResponseError) {
+            console.error("Validation or user error:", error.message);
+            throw error;
+        }
+
+        if (error instanceof z.ZodError) {
+            console.error("Validation error:", error.errors);
+            const details = error.errors.map((e) => ({
+                field: e.path.join("."),
+                message: e.message,
+            }));
+            throw new ResponseError(400, "Validation failed", details);
+        }
+
+        console.error("Unexpected error in user-service:", error);
+        throw new ResponseError(500, "An unexpected error occurred");
+    }
     static async register(request: CreateUserRequest): Promise<UserResponse> {
         try {
-            // request.id = uuidv4();
             const authService = new AuthService();
             const registerRequest = UserValidation.REGISTER.parse(request);
             // Check if the username is already in database
@@ -31,7 +48,6 @@ export class UserService {
                 throw new ResponseError(400, "Username already exists");
             }
 
-            // registerRequest.password = await bcrypt.hash(registerRequest.password, 10); // Hash the password
             const { salt, hash } = await authService.hashPassword(registerRequest.password);
             registerRequest.password = hash; // Save the hash
             registerRequest.salt = salt; // Save the salt
@@ -40,23 +56,7 @@ export class UserService {
 
             return toUserResponse(createdUser);
         } catch (error) {
-            if (error instanceof ResponseError) {
-                // Log the error and re-throw it for specific handling in index.ts
-                console.error("Validation or user error:", error.message);
-                throw error;
-            } else if (error instanceof z.ZodError) {
-                console.error("Validation error:", error.errors);
-                // Map Zod errors to a more detailed structure and throw the details
-                const details = error.errors.map((e) => ({
-                    field: e.path.join("."), // Join path segments for nested objects
-                    message: e.message,
-                }));
-
-                throw new ResponseError(400, "Validation failed", details);
-            }
-
-            console.error("Unexpected error in user-service:", error);
-            throw new ResponseError(500, "An unexpected error occurred");
+            this.handleServiceError(error);
         }
     }
 
@@ -77,7 +77,6 @@ export class UserService {
             }
             const user = users[0];
 
-            console.log("User found:", user);
             // Check password
             const isPasswordValid = await authService.comparePassword(user.password, user.salt, loginRequest.password);
             if (!isPasswordValid) {
@@ -97,23 +96,7 @@ export class UserService {
 
             return toUserResponse(user);
         } catch (error) {
-            if (error instanceof ResponseError) {
-                // Log the error and re-throw it for specific handling in index.ts
-                console.error("Validation or user error:", error.message);
-                throw error;
-            } else if (error instanceof z.ZodError) {
-                console.error("Validation error:", error.errors);
-                // Map Zod errors to a more detailed structure and throw the details
-                const details = error.errors.map((e) => ({
-                    field: e.path.join("."), // Join path segments for nested objects
-                    message: e.message,
-                }));
-
-                throw new ResponseError(400, "Validation failed", details);
-            }
-
-            console.error("Unexpected error in user-service:", error);
-            throw new ResponseError(500, "An unexpected error occurred");
+            this.handleServiceError(error);
         }
     }
 
@@ -139,23 +122,7 @@ export class UserService {
 
             return toUserResponse(currentUser);
         } catch (error) {
-            if (error instanceof ResponseError) {
-                // Log the error and re-throw it for specific handling in index.ts
-                console.error("Validation or user error:", error.message);
-                throw error;
-            } else if (error instanceof z.ZodError) {
-                console.error("Validation error:", error.errors);
-                // Map Zod errors to a more detailed structure and throw the details
-                const details = error.errors.map((e) => ({
-                    field: e.path.join("."), // Join path segments for nested objects
-                    message: e.message,
-                }));
-
-                throw new ResponseError(400, "Validation failed", details);
-            }
-
-            console.error("Unexpected error in user-service:", error);
-            throw new ResponseError(500, "An unexpected error occurred");
+            this.handleServiceError(error);
         }
     }
 
@@ -222,23 +189,7 @@ export class UserService {
                 name: updatedUser.name,
             };
         } catch (error) {
-            if (error instanceof ResponseError) {
-                // Log the error and re-throw it for specific handling in index.ts
-                console.error("Validation or user error:", error.message);
-                throw error;
-            } else if (error instanceof z.ZodError) {
-                console.error("Validation error:", error.errors);
-                // Map Zod errors to a more detailed structure and throw the details
-                const details = error.errors.map((e) => ({
-                    field: e.path.join("."), // Join path segments for nested objects
-                    message: e.message,
-                }));
-
-                throw new ResponseError(400, "Validation failed", details);
-            }
-
-            console.error("Unexpected error in user-service:", error);
-            throw new ResponseError(500, "An unexpected error occurred");
+            this.handleServiceError(error);
         }
     }
 }

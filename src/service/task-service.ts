@@ -33,7 +33,6 @@ export class TaskService {
 
     static async create(user: User, request: CreateTaskRequest): Promise<Task> {
         try {
-            // request.id = uuidv4();
             const createRequest = TaskValidation.CREATE.parse(request);
 
             const createdTask = {

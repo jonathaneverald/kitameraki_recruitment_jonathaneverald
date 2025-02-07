@@ -28,7 +28,6 @@ const createTask = async (request: HttpRequest, context: AuthenticatedContext): 
         context.log(`Http function processed request for url "${request.url}"`);
         const createTaskRequest = (await request.json()) as CreateTaskRequest;
         const task = await TaskService.create(context.currentUser, createTaskRequest);
-        // call publish event here
         await EventGridService.publishEvent("create", "Task.Created", context.currentUser.id, task, []);
         return {
             status: 201,
@@ -47,7 +46,6 @@ const updateTask = async (request: HttpRequest, context: AuthenticatedContext, i
     try {
         const updateTaskRequest = (await request.json()) as UpdateTaskRequest;
         const task = await TaskService.update(context.currentUser, updateTaskRequest, id);
-        // Publish the event
         await EventGridService.publishEvent("update", "Task.Updated", context.currentUser.id, task.updatedTask, task.changes);
         return {
             status: 200,
@@ -101,7 +99,6 @@ const getTasks = async (request: HttpRequest, context: AuthenticatedContext): Pr
 const deleteTask = async (request: HttpRequest, context: AuthenticatedContext, id: string): Promise<HttpResponseInit> => {
     try {
         const task = await TaskService.delete(context.currentUser, id);
-        // Publish the event
         await EventGridService.publishEvent("delete", "Task.Deleted", context.currentUser.id, task, []);
         return {
             status: 200,
