@@ -306,6 +306,7 @@ namespace AzureNet.Services
         }
 
         // Methods to handle request from Activity (Durable functions)
+        // These methods created to handle request from Activity Durable Functions
         public async Task<TaskModel> CreateTaskActivity(TaskRequest taskRequest, FunctionContext context, string userId)
         {
             var logger = context.GetLogger("TaskService");
