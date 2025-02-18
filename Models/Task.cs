@@ -87,9 +87,6 @@ namespace AzureNet.Models
 
     public class TaskRequest
     {
-        // [JsonProperty(PropertyName = "id")]
-        // public string? Id { get; set; }
-
         [JsonProperty(PropertyName = "title")]
         public required string Title { get; set; }
 
@@ -109,18 +106,6 @@ namespace AzureNet.Models
 
         [JsonProperty(PropertyName = "tags")]
         public List<string>? Tags { get; set; }
-
-        // [JsonProperty(PropertyName = "createdAt")]
-        // public DateTime? CreatedAt { get; set; }
-
-        // [JsonProperty(PropertyName = "updatedAt")]
-        // public DateTime? UpdatedAt { get; set; }
-
-        // [JsonProperty(PropertyName = "userId")]
-        // public string? UserId { get; set; }
-
-        // [JsonProperty(PropertyName = "changes")]
-        // public List<object>? Changes { get; set; }
     }
 
     public class TaskBatchRequest

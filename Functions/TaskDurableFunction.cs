@@ -11,56 +11,6 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureNet.Functions
 {
-    public static class DurableFunctionsOrchestrationCSharp1
-    {
-        // Orchestration
-        [Function(nameof(DurableFunctionsOrchestrationCSharp1))]
-        public static async Task<List<string>> RunOrchestrator(
-            [OrchestrationTrigger] TaskOrchestrationContext context)
-        {
-            ILogger logger = context.CreateReplaySafeLogger(nameof(DurableFunctionsOrchestrationCSharp1));
-            logger.LogInformation("Saying hello.");
-            var outputs = new List<string>();
-
-            // Replace name and input with values relevant for your Durable Functions Activity
-            outputs.Add(await context.CallActivityAsync<string>(nameof(SayHello), "Tokyo"));
-            outputs.Add(await context.CallActivityAsync<string>(nameof(SayHello), "Seattle"));
-            outputs.Add(await context.CallActivityAsync<string>(nameof(SayHello), "London"));
-
-            // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-            return outputs;
-        }
-
-        // Activity
-        [Function(nameof(SayHello))]
-        public static string SayHello([ActivityTrigger] string name, FunctionContext executionContext)
-        {
-            ILogger logger = executionContext.GetLogger("SayHello");
-            logger.LogInformation("Saying hello to {name}.", name);
-            return $"Hello {name}!";
-        }
-
-        // Client
-        [Function("DurableFunctionsOrchestrationCSharp1_HttpStart")]
-        public static async Task<HttpResponseData> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
-            [DurableClient] DurableTaskClient client,
-            FunctionContext executionContext)
-        {
-            ILogger logger = executionContext.GetLogger("DurableFunctionsOrchestrationCSharp1_HttpStart");
-
-            // Function input comes from the request content.
-            string instanceId = await client.ScheduleNewOrchestrationInstanceAsync(
-                nameof(DurableFunctionsOrchestrationCSharp1));
-
-            logger.LogInformation("Started orchestration with ID = '{instanceId}'.", instanceId);
-
-            // Returns an HTTP 202 response with an instance management payload.
-            // See https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-http-api#start-orchestration
-            return await client.CreateCheckStatusResponseAsync(req, instanceId);
-        }
-    }
-
     public class TaskDurableFunctionsOrchestration(TaskService taskService)
     {
         private readonly TaskService _taskService = taskService;
@@ -134,43 +84,6 @@ namespace AzureNet.Functions
                 logger.LogError($"Error in orchestrator: {ex.Message}");
                 throw; // Rethrow to maintain the error details
             }
-
-            // // Add validation for empty input
-            // if (input?.Tasks == null || input.Tasks.Count == 0)
-            // {
-            //     return new TaskOrchestratorResult
-            //     {
-            //         ProcessedBatches = 0,
-            //         Results = new List<object>()
-            //     };
-            // }
-
-            // // Split the tasks into batches
-            // int batchSize = 2;
-            // var taskBatches = SplitTasks(input.Tasks, batchSize);
-            // Console.WriteLine($"Task batches: {taskBatches}");
-
-            // // Process the tasks
-            // var batchTaskActivities = new List<Task<List<object>>>();
-            // foreach (var batch in taskBatches)
-            // {
-            //     batchTaskActivities.Add(context.CallActivityAsync<List<object>>("TaskActivity",
-            //     new TaskActivityInput
-            //     {
-            //         Tasks = batch,
-            //         Operation = input.Operation,
-            //         UserId = userId,
-            //     }));
-            // }
-
-            // var batchResults = await Task.WhenAll(batchTaskActivities);
-            // Console.WriteLine($"Batch Results: {batchResults}");
-
-            // return new TaskOrchestratorResult
-            // {
-            //     ProcessedBatches = batchResults.Length,
-            //     Results = batchResults.SelectMany(r => r).ToList()
-            // };
         }
 
         // Activity
@@ -314,5 +227,4 @@ namespace AzureNet.Functions
             }
         }
     }
-
 }
